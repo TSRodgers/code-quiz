@@ -136,6 +136,7 @@ function startQuiz() {
     // starts timer
     countdown();
     // randomizes the starting question
+    // I'm pretty sure this is es6, didn't remember how to randomize order and looked it up on stack overflow, found it while I was down a rabbit hole and cant find the exact post again so unable to cite exact person I borrowed it from.
     randomQuestion = questions.sort(() => Math.random() - .5)
     currentQuestion = 0
     // unhides container questions will be appended to
