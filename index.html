@@ -9,7 +9,7 @@
   </head>
   <body>
     <header class="header" id="header">
-      <h3>View High Scores</h3>
+      <h3><a href="./highscore.html">View High Scores</a></h3>
       <h3 class="timer" id="timer"></h3>
     </header>
     <main class="page-content" id="page-content">
@@ -24,9 +24,20 @@
       </div>
       <div>
         <div class="hide" id="question-container">
-          <div id="question">Question</div>
+          <div id="question"></div>
           <div class="answer-btn" id="answer-button"></div>
           <div class="correct" id="correct"></div>
+        </div>
+        <div class="hide" id="form-container">
+          <form class="name-form" id="name-form">
+            <input
+              class="name-input"
+              id="name-input"
+              name="initials"
+              placeholder="Enter your initials!"
+            />
+            <button class="btn submit-btn" id="submit-btn">Submit</button>
+          </form>
         </div>
       </div>
     </main>

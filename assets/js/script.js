@@ -1,17 +1,23 @@
-var startButtonEl = document.querySelector("#start-btn");
-var pageContentEl = document.querySelector("#page-content");
-var startPageEl = document.querySelector("#start-page")
-var questionContainerEl = document.querySelector("#question-container");
-var questionEl = document.querySelector("#question");
-var answerButtonsEl = document.querySelector("#answer-button");
-var timerEl = document.querySelector("#timer");
-var correctEl = document.querySelector("#correct");
-var headerEl = document.querySelector("#header");
-var timeInterval
-var timeLeft = 75
-var randomQuestion
-var currentQuestion
-var questions = [
+let scoreIdCounter
+let startButtonEl = document.getElementById("start-btn");
+let pageContentEl = document.getElementById("page-content");
+let startPageEl = document.getElementById("start-page")
+let questionContainerEl = document.getElementById("question-container");
+let questionEl = document.getElementById("question");
+let answerButtonsEl = document.getElementById("answer-button");
+let timerEl = document.getElementById("timer");
+let correctEl = document.getElementById("correct");
+let headerEl = document.getElementById("header");
+let formEl = document.getElementById("form-container");
+let inputEl = document.getElementById("name-input");
+let submitButtonEl = document.getElementById("submit-btn")
+let timeInterval
+let timeLeft = 75
+let playerScore
+let randomQuestion
+let currentQuestion
+let highScores = []
+let questions = [
     {
         question: "What does HTML stand for?",
         answers: [
@@ -61,10 +67,12 @@ var questions = [
             {text: "msgBox('Hello World');", correct: false }
         ]
     }
-]
+];
 
-var nextQuestion = function() {
+function nextQuestion() {
+    // clears page for next question/answer
     answerButtonsEl.innerHTML = ""
+    // runs showQuestions function until all questions have been shown, then runs endQuiz
     if (randomQuestion.length > currentQuestion) {
     showQuestion(randomQuestion[currentQuestion])
     }
@@ -73,40 +81,41 @@ var nextQuestion = function() {
     }
 };
 
-var showQuestion = function(question) {
+function showQuestion(question) {
     questionEl.innerText = question.question;
+    // runs function for each answer choice, creates buttons, adds text, and adds dataset for each
     question.answers.forEach(answer => {
-        var answerButton = document.createElement("button");
+        let answerButton = document.createElement("button");
         answerButton.innerText = answer.text;
         answerButton.dataset.correct = answer.correct;
-        answerButton.className = "btn";
+        answerButton.className = "btn answer-btn";
         answerButtonsEl.appendChild(answerButton);
         answerButton.addEventListener("click", selectAnswer);
     })
 };
 
-var selectAnswer = function(event) {
-    var selectedAnswer = event.target
-    console.log(selectedAnswer);
-    console.log(selectedAnswer.dataset["correct"]);
-
+function selectAnswer(event) {
+    // checks if answer is correct or incorrect
+    let selectedAnswer = event.target
     if (selectedAnswer.dataset["correct"] === "true") {
         console.log("correct")
         currentQuestion++
         correctEl.textContent="Correct!"
         nextQuestion();
     }
+    // if incorrect, subtract 10 sec from time
     else if (selectedAnswer.dataset["correct"] === "false") {
         console.log("incorrect")
         currentQuestion++
-        correctEl.textContent="Incorrrect!"
+        correctEl.textContent="Incorrect!"
         timeLeft -= 10;
         nextQuestion();
     }
-}
+};
 
-var countdown = function() {
+function countdown() {
     timeInterval = setInterval(function() {
+        // stops function from running if timer hits 0
         if (timeLeft >= 0) {
         timerEl.textContent = "Time: " + timeLeft
         timeLeft--; }
@@ -116,34 +125,85 @@ var countdown = function() {
     }, 1000); 
 
     
-}
+};
 
-var startQuiz = function() {
+// starts quiz 
+function startQuiz() {
     console.log("starting")
+    //clears page to make room for questions
     startPageEl.innerHTML = ""
     timerEl.textContent = "Time: " + timeLeft;
+    // starts timer
     countdown();
+    // randomizes the starting question
     randomQuestion = questions.sort(() => Math.random() - .5)
     currentQuestion = 0
+    // unhides container questions will be appended to
     questionContainerEl.classList.remove("hide");
     nextQuestion();
 };
 
-var endQuiz = function () {
+function endQuiz() {
     // clears questions container to make room for final screen
     questionContainerEl.innerHTML = ""
-    // saves timeLeft as playerScore, and stops the timer
+    // saves timeLeft as playerScore,adds to local storage, and stops the timer
     clearInterval(timeInterval);
-    var playerScore = timeLeft;
+    playerScore = Math.max(0, timeLeft);
     // adds final screen html elements 
-    var completedHeaderEl = document.createElement("h2");
+    let completedHeaderEl = document.createElement("h2");
     completedHeaderEl.textContent = "Completed Quiz!";
     questionContainerEl.appendChild(completedHeaderEl);
-    var playerScoreEl = document.createElement("p");
-    playerScoreEl.textContent = "Your final score is " + playerScore + "!"
+    let playerScoreEl = document.createElement("p");
+    playerScoreEl.textContent = "Your final score is " + Math.max(0, playerScore) + "!"
     questionContainerEl.appendChild(playerScoreEl);
+    // reveals form for players to submit their score
+    formEl.classList.remove("hide");
+};
 
-    console.log("game ended");
+function submitScore(event) {
+    event.preventDefault();
+    // checks if player entered initials
+    var playerNameInput = inputEl.value;
+    // If input field is left blank, throws error and stops function
+    if (!playerNameInput) {
+        alert("You need to enter your initials!");
+        return false
+    } else {
+        // if input is valid puts data into array and passes to saveScore()
+        var scoreDataObj = {
+            score: playerScore,
+            name: playerNameInput,
+        };
+
+        saveScore(scoreDataObj);
+    }
+    location.href = "./highscore.html"   
+};
+
+function loadScores() {
+    var savedScores = localStorage.getItem("scores")
+    // if no scores have been saved, return false
+    if (!savedScores) {
+        return false;
+    }
+    // parse into array of objects and then push into highscores array
+    savedScores = JSON.parse(savedScores);
+    // loops through savedScores array and pushes as to not push it all as one array entry
+    for (var i =0; i < savedScores.length; i++) {
+    highScores.push(savedScores[i])
+    }
+};
+
+function saveScore(scoreDataObj) {
+    // runs loadScores() function to check if any scores have been saved
+    loadScores();
+    // pushes data passde by submitScore() function into array and then sends array to local storage
+    highScores.push(scoreDataObj);
+    localStorage.setItem("scores", JSON.stringify(highScores));
 }
 
-startButtonEl.addEventListener("click", startQuiz)
+startButtonEl.addEventListener("click", startQuiz);
+submitButtonEl.addEventListener("click", submitScore);
+
+
+
