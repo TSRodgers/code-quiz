@@ -4,6 +4,11 @@ var startPageEl = document.querySelector("#start-page")
 var questionContainerEl = document.querySelector("#question-container");
 var questionEl = document.querySelector("#question");
 var answerButtonsEl = document.querySelector("#answer-button");
+var timerEl = document.querySelector("#timer");
+var correctEl = document.querySelector("#correct");
+var headerEl = document.querySelector("#header");
+var timeInterval
+var timeLeft = 75
 var randomQuestion
 var currentQuestion
 var questions = [
@@ -88,18 +93,36 @@ var selectAnswer = function(event) {
     if (selectedAnswer.dataset["correct"] === "true") {
         console.log("correct")
         currentQuestion++
+        correctEl.textContent="Correct!"
         nextQuestion();
     }
     else if (selectedAnswer.dataset["correct"] === "false") {
         console.log("incorrect")
         currentQuestion++
+        correctEl.textContent="Incorrrect!"
+        timeLeft -= 10;
         nextQuestion();
     }
+}
+
+var countdown = function() {
+    timeInterval = setInterval(function() {
+        if (timeLeft >= 0) {
+        timerEl.textContent = "Time: " + timeLeft
+        timeLeft--; }
+        else {
+            clearInterval(timeInterval);
+        }
+    }, 1000); 
+
+    
 }
 
 var startQuiz = function() {
     console.log("starting")
     startPageEl.innerHTML = ""
+    timerEl.textContent = "Time: " + timeLeft;
+    countdown();
     randomQuestion = questions.sort(() => Math.random() - .5)
     currentQuestion = 0
     questionContainerEl.classList.remove("hide");
@@ -107,6 +130,19 @@ var startQuiz = function() {
 };
 
 var endQuiz = function () {
+    // clears questions container to make room for final screen
+    questionContainerEl.innerHTML = ""
+    // saves timeLeft as playerScore, and stops the timer
+    clearInterval(timeInterval);
+    var playerScore = timeLeft;
+    // adds final screen html elements 
+    var completedHeaderEl = document.createElement("h2");
+    completedHeaderEl.textContent = "Completed Quiz!";
+    questionContainerEl.appendChild(completedHeaderEl);
+    var playerScoreEl = document.createElement("p");
+    playerScoreEl.textContent = "Your final score is " + playerScore + "!"
+    questionContainerEl.appendChild(playerScoreEl);
+
     console.log("game ended");
 }
 

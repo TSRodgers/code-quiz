@@ -8,7 +8,10 @@
     <link rel="stylesheet" href="./assets/css/style.css" />
   </head>
   <body>
-    <header>View High Scores</header>
+    <header class="header" id="header">
+      <h3>View High Scores</h3>
+      <h3 class="timer" id="timer"></h3>
+    </header>
     <main class="page-content" id="page-content">
       <div class="start-page" id="start-page">
         <h2 class="start-header" id="start-header">Coding Quiz Challenge</h2>
@@ -23,6 +26,7 @@
         <div class="hide" id="question-container">
           <div id="question">Question</div>
           <div class="answer-btn" id="answer-button"></div>
+          <div class="correct" id="correct"></div>
         </div>
       </div>
     </main>
